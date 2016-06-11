@@ -75,6 +75,10 @@ GLuint  tex;
 RgbImage imag;
 GLUquadric* qobj;
 
+// ----------------- Disk
+GLdouble heightDisk = 4.0;
+GLdouble radiusDisk = 2.0;
+
 
 
 void criaDefineTexturas()
@@ -168,10 +172,11 @@ void drawScene(){
 	//~~~~~~~~~~~~~~~~~~~~~~~Cylinder (disk)
 	//drawDisk();
 	glColor4f(0,1,0,0);
-	glBegin(GL_LINES);
-		gluCylinder(qobj, 2.0, 2.0, 4, 40, 20);
-		glRotatef(90, 1, 1, 1);
-	glEnd();
+	glPushMatrix();
+		glTranslatef(0,heightDisk,0);
+		glRotatef(90,1,0,0);
+		gluCylinder(qobj, radiusDisk, radiusDisk, heightDisk, 40, 20);
+	glPopMatrix();
 
 }
 
