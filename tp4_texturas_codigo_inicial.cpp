@@ -76,8 +76,14 @@ RgbImage imag;
 GLUquadric* qobj;
 
 // ----------------- Disk
-GLdouble heightDisk = 4.0;
-GLdouble radiusDisk = 2.0;
+GLdouble heightDisk = 1.0;
+GLdouble radiusDisk = 1.0;
+//const float PI = 3.14159/180;
+
+// ----------------- Texto
+char texto[30];
+
+
 
 
 
@@ -125,16 +131,35 @@ void resizeWindow(GLsizei w, GLsizei h)
 }
 
 
-void drawDisk() {
-	glPushMatrix();
-		printf("Here!\n");
-		glColor3f(0,1,0);
-		gluCylinder(qobj, 1.0, 1.0, 0.4, 1, 16);
-	glPopMatrix();
-}
-
 void cleanup() {
 	gluDeleteQuadric(qobj);
+}
+
+//================================================================================
+//======================================================================== DISPLAY
+void displayText(char *string, GLfloat x, GLfloat y, GLfloat z) 
+{  
+	glRasterPos3f(x,y,z); 
+	while(*string)
+	  glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, *string++); 
+}
+
+void drawCircle(GLfloat x, GLfloat y, GLfloat radius){
+	int i;
+	int triangleAmount = 20; //# of triangles used to draw circle
+	
+	//GLfloat radius = 0.8f; //radius
+	GLfloat twicePi = 2.0f * PI;
+	
+	glBegin(GL_TRIANGLE_FAN);
+		glVertex2f(x, y); // center of circle
+		for(i = 0; i <= triangleAmount;i++) { 
+			glVertex2f(
+		        x + (radius * cos(i *  twicePi / triangleAmount)), 
+			    y + (radius * sin(i * twicePi / triangleAmount))
+			);
+		}
+	glEnd();
 }
 
 void drawScene(){
@@ -170,15 +195,24 @@ void drawScene(){
 	glEnd();
 
 	//~~~~~~~~~~~~~~~~~~~~~~~Cylinder (disk)
-	//drawDisk();
-	glColor4f(0,1,0,0);
+
+	glColor4f(0,0,0,0);
 	glPushMatrix();
 		glTranslatef(0,heightDisk,0);
 		glRotatef(90,1,0,0);
 		gluCylinder(qobj, radiusDisk, radiusDisk, heightDisk, 40, 20);
+		drawCircle(0,0, radiusDisk);
 	glPopMatrix();
 
+
+	//~~~~~~~~~~~~~~~~~~~~~~~Display Coordinates of Observer
+	glColor3f(0,0,1);
+	sprintf(texto, "Pos: (%.0f,%.0f,%.0f)", obsP[0], obsP[1], obsP[2]);
+	displayText(texto,0,3,0);
+
+
 }
+
 
 void display(void){
   	
@@ -259,7 +293,8 @@ void teclasNotAscii(int key, int x, int y){
 		obsP[1]=-yC;
     obsP[0] = raio*cos(angulo);
 	obsP[2] = raio*sin(angulo);
-	
+
+
 	glutPostRedisplay();	
 }
 
