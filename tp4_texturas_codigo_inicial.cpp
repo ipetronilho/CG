@@ -52,7 +52,7 @@ GLint    defineProj=1;
 GLfloat  raio   = 20;
 GLfloat  angulo = 0.35*PI;
 //GLfloat  obsP[] = {raio*cos(angulo), 5.5, raio*sin(angulo)};
-GLfloat  obsP[] = {0,2,0};
+GLfloat  obsP[] = {0,5,0};
 GLfloat  incy   = 0.5;
 GLfloat  inca   = 0.03;
 GLfloat  angBule = 0;
@@ -84,7 +84,9 @@ GLdouble radiusDisk = 1.0;
 char texto[30];
 
 
+void drawStick() {
 
+}
 
 
 void criaDefineTexturas()
@@ -163,20 +165,20 @@ void drawCircle(GLfloat x, GLfloat y, GLfloat radius){
 }
 
 void drawScene(){
+
 	
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Chao y=0
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D,texture[1]);
 	glPushMatrix();
 		glBegin(GL_QUADS);
-			glTexCoord2f(0.0f,0.0f); glVertex3i( 0,  0, 0 ); 	// assumo que vou ler mais do que 1 imagem. grelha de 10 figuras por 10 figuras.
-			glTexCoord2f(10.0f,0.0f); glVertex3i( xC, 0, 0 ); 
-			glTexCoord2f(10.0f,10.0f); glVertex3i( xC, 0, xC); 
+			glTexCoord2f(0.0f,0.0f); glVertex3i( 0,  0, -xC ); 	// assumo que vou ler mais do que 1 imagem. grelha de 10 figuras por 10 figuras.
+			glTexCoord2f(10.0f,0.0f); glVertex3i( xC*2, 0, -xC ); 
+			glTexCoord2f(10.0f,10.0f); glVertex3i( xC*2, 0, xC); 
 			glTexCoord2f(0.0f,10.0f); glVertex3i( 0,  0,  xC); 
 		glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
-
 	
 
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Eixos
@@ -198,7 +200,7 @@ void drawScene(){
 
 	glColor4f(0,0,0,0);
 	glPushMatrix();
-		glTranslatef(0,heightDisk,0);
+		glTranslatef(5,heightDisk,0);
 		glRotatef(90,1,0,0);
 		gluCylinder(qobj, radiusDisk, radiusDisk, heightDisk, 40, 20);
 		drawCircle(0,0, radiusDisk);
@@ -210,7 +212,12 @@ void drawScene(){
 	sprintf(texto, "Pos: (%.0f,%.0f,%.0f)", obsP[0], obsP[1], obsP[2]);
 	displayText(texto,0,3,0);
 
+		//~~~~~~~~~~~~~~~~~~~~~~~Display Coordinates of Observer
+	glColor3f(0,0,1);
+	sprintf(texto, "Pos: (%.0f,%.0f,%.0f)", obsP[0], obsP[1], obsP[2]);
+	displayText(texto,0,0,0);
 
+	glutPostRedisplay();
 }
 
 
@@ -235,7 +242,7 @@ void display(void){
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	//gluLookAt(obsP[0], obsP[1], obsP[2], 0,0,0, 0, 1, 0);
-	gluLookAt(obsP[0], obsP[1], obsP[2], 0,0,5, 0, 1, 0);
+	gluLookAt(obsP[0], obsP[1], obsP[2], 5,0,0, 0, 1, 0);
 	
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[ Objectos ]
 	drawScene();
