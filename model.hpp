@@ -11,6 +11,8 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+//#include <GL/glaux.h> ??
+
 #include "RgbImage.h"
 
 #define debug 1
@@ -50,10 +52,6 @@ class Model{
         /* Fazer a leitura do ficheiro .obj para os arrays correspondentes */
         void loadingFileObj(){
 
-            if(debug){
-                printf("Caminho: %s\n", filename);
-            }
-
             /* Open file */
             //ifstream myFile(fileName, ios::in);
             ifstream myFile;
@@ -66,6 +64,7 @@ class Model{
             /* Caso nao tenha encontrado o nome do ficheiro ou nao consiga abrir, imprime uma mensagem de erro */
             if (myFile.fail()){
                 cerr << "Cannot open " << filename << endl;
+                
                 exit(1);
             }
 
@@ -74,8 +73,8 @@ class Model{
 
             if(debug){
                 cout << "V_Size: " << v_size << " VT_Size: " << vt_size << " VN_Size: " << vn_size << " F_Size: " << f_size << endl;
-            }
 
+            }
             /* Read sizes */
             while(myFile >> line){
                 if(line.compare("v")==0){
@@ -94,6 +93,7 @@ class Model{
 
             if(debug){
                 cout << "V_Size: " << v_size << " VT_Size: " << vt_size << " VN_Size: " << vn_size << " F_Size: " << f_size << endl;
+                writeFile(v_size, vt_size, vn_size, f_size);
             }
 
             /* Declaration arrays */
@@ -113,6 +113,7 @@ class Model{
 
             if(debug){
                 cout << "Second round MY_FILE: " << myFile << endl;
+
             }
 
             while (myFile >> line){
@@ -153,6 +154,7 @@ class Model{
                     x=0;
                     while(x<9){
                         myFile >> line_aux;
+
                         /* Para me separar os numeros pela / e guardar */
                         sscanf(line_aux,"%d/%d/%d",&f[aux_f*9 + x], &f[aux_f*9 + (x+1)], &f[aux_f*9 + (x+2)]);
                         if(debug){
@@ -163,9 +165,10 @@ class Model{
                     aux_f++;
                 }
             }
-
+            printf("\nAfter reading");
             /* Close file */
             myFile.close();
+            printf("\nAfter reading");
         }
 
 
@@ -192,7 +195,7 @@ class Model{
                 glColor3f(r, g, b); // white so it doesn't affect the texture
                 glTranslatef(x, y, z);
                 glScalef(xs, ys, zs);
-                glRotatef(rotation, 0, 1, 0);
+                glRotatef(rotation, 1, 0, 0);
 
 
                 int aux_num;
@@ -231,6 +234,22 @@ class Model{
                 }
 
                 glPopMatrix();
+        }
+
+        void writeFile(int v_size, int vt_size, int vn_size, int f_size) {
+            char str[20];
+            FILE *f = fopen("file.txt", "w");
+            if (f == NULL)
+            {
+                printf("Error opening file!\n");
+                exit(1);
+            }
+
+            /* print some text */
+            //fprintf(f, "Filename %s", filename);
+            fprintf(f, "v_size, vt_size, vn_size, f_size: %d, %d, %d, %d", v_size, vt_size, vn_size, f_size);
+
+            fclose(f);
         }
 
 

@@ -16,8 +16,9 @@
 //#include "RgbImage.h"
 #include "model.hpp"
 
-#define CURLING_STONE_TEXTURE "curlingball.bmp"
-#define CURLING_STONE_OBJ "curlingmodel.obj"
+#define CURLING_STONE_TEXTURE "mesa.bmp"
+#define CURLING_STONE_OBJ "stone_model.obj"
+
 
 
 //--------------------------------- Definir cores
@@ -151,6 +152,10 @@ void criaDefineTexturas()
 }
 */
 
+void loadModels() {
+	stoneModel.init(CURLING_STONE_OBJ, CURLING_STONE_TEXTURE);
+}
+
 void init(void)
 {
 	glClearColor(WHITE);
@@ -162,7 +167,8 @@ void init(void)
 	//only called once
 	qobj = gluNewQuadric();
 	gluQuadricNormals(qobj, GLU_SMOOTH);
-
+	loadModels();
+	remove("file.txt");
 }
 
 
@@ -208,8 +214,7 @@ void drawCircle(GLfloat x, GLfloat y, GLfloat radius){
 }
 
 void drawStone() {
-	stoneModel.init(CURLING_STONE_OBJ, CURLING_STONE_TEXTURE);
-	//stoneModel.drawModel();
+	stoneModel.drawModel(0,0,0, 0.1, 0.1, 0.1, -90, 1, 1, 1);
 }
 
 void drawScene(){
@@ -245,7 +250,7 @@ void drawScene(){
 	glEnd();
 
 	//~~~~~~~~~~~~~~~~~~~~~~~Cylinder (disk)
-
+/*
 	glColor4f(0,0,0,0);
 	glPushMatrix();
 		glTranslatef(diskP[0], diskP[1], diskP[2]);
@@ -253,7 +258,7 @@ void drawScene(){
 		gluCylinder(qobj, radiusDisk, radiusDisk, heightDisk, 40, 20);
 		drawCircle(0,0, radiusDisk);
 	glPopMatrix();
-
+*/
 
 	//~~~~~~~~~~~~~~~~~~~~~~~Display Coordinates of Observer
 	glColor3f(0,0,1);
