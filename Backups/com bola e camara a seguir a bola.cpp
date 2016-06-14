@@ -13,11 +13,7 @@
 #include <GL/glut.h>
 #endif
 
-//#include "RgbImage.h"
-#include "model.hpp"
-
-#define CURLING_STONE_TEXTURE "curlingball.bmp"
-#define CURLING_STONE_OBJ "curlingmodel.obj"
+#include "RgbImage.h"
 
 
 //--------------------------------- Definir cores
@@ -97,7 +93,7 @@ GLfloat lengthStick = 3;
 
 GLfloat  stickP[] = {0,heightStick,lengthStick};
 GLfloat  stickP2[] = {0,heightStick,0};
-GLfloat  positionStick[] = {diskP[0]+radiusDisk, 0,-lengthStick/2};
+
 //const float PI = 3.14159/180;
 
 // ----------------- Texto
@@ -105,33 +101,25 @@ char texto[30];
 
 // ----------------- START
 int start=1;
-int moveBall=0;
-int moveStick=0;
-int leftStick=0;
-int rightStick=0;
-
-// ---------------- Modelo da stone
-Model stoneModel;
+int move=0;
 
 void drawStick() {
-	
-	glTranslatef(positionStick[0], positionStick[1], positionStick[2]); // para se manter sempre em frente do disco
+	glColor3f(0,0,1);
+	glTranslatef(diskP[0]+radiusDisk, 0,-lengthStick/2); // translate para um ponto em frente do disco
 //glRotatef(180,0,1,0);
 	glTranslatef(0,0,0);
-	glBegin(GL_LINES);									// stick da esquerda
-		glColor3f(0,0,1);
+	glBegin(GL_LINES);
 		glVertex3i( 0,0,0);
-		glVertex3i(0, stickP[1], stickP[2]);	
+		glVertex3i(0, stickP[1], stickP[2]);	// 
 	glEnd();
 
-	glBegin(GL_LINES);									// stick da direita
-		glColor3f(1,0,0);
+	glBegin(GL_LINES);
 		glVertex3i( 0,0,lengthStick);
-		glVertex3i(0, stickP2[1], stickP2[2]);
+		glVertex3i(0, stickP2[1], stickP2[2]);	// 
 	glEnd();
 }
 
-/*
+
 void criaDefineTexturas()
 {
 	//----------------------------------------- Chao y=0
@@ -149,13 +137,13 @@ void criaDefineTexturas()
 		imag.ImageData());
 
 }
-*/
+
 
 void init(void)
 {
 	glClearColor(WHITE);
 	glShadeModel(GL_SMOOTH);
-	//criaDefineTexturas( );
+	criaDefineTexturas( );
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
 
@@ -205,11 +193,6 @@ void drawCircle(GLfloat x, GLfloat y, GLfloat radius){
 			);
 		}
 	glEnd();
-}
-
-void drawStone() {
-	stoneModel.init(CURLING_STONE_OBJ, CURLING_STONE_TEXTURE);
-	//stoneModel.drawModel();
 }
 
 void drawScene(){
@@ -273,7 +256,6 @@ void drawScene(){
 
 	drawStick();
 
-	drawStone();
 	glutPostRedisplay();
 }
 
@@ -308,22 +290,13 @@ void display(void){
 	glutSwapBuffers();
 }
 
-
 // J: mexer para a esquerda. K: mexer como se fosse o da direita
-void moveStickAutomatically() {
-	/*if (leftStick) {
-		positionStick[2] += 0.1;
-		if(positionStick[2] == )
-	}*/
-}
-
-
 void moveBallAutomatically() {
 	diskP[0] += constantSpeed*initialSpeed;
 	obsP[0] += constantSpeed*initialSpeed;
 	objP[0] += constantSpeed*initialSpeed;
 	if (diskP[0] > 20)
-		moveBall=!moveBall;
+		move=!move;
 
 }
 
@@ -356,12 +329,8 @@ void Timer(int value)
 		defineInitialSpeed();
 	}
 
-	if (moveBall) {
+	if (move) {
 		moveBallAutomatically();
-	}
-
-	if (moveStick) {
-		moveStickAutomatically();
 	}
 
 	glutPostRedisplay();
@@ -377,17 +346,13 @@ void keyboard(unsigned char key, int x, int y){
 	case 's':
 	case 'S':
 		start=0; // já não estamos em modo start
-		moveBall=1;
+		move=1;
 		glutPostRedisplay();
 		break;
 
 	case 'j':
 	case 'J':
-		if (!moveStick) {
-			moveStick=1;
-			glutPostRedisplay();
-			break;
-		}
+
 		break;
 /*
 	//--------------------------- Textura no papel de parede

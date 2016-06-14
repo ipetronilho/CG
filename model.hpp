@@ -11,15 +11,11 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glaux.h>
 #include "RgbImage.h"
 
 #define debug 1
 #define tam_line_aux 100
 using namespace std;
-
-#define CAMO_SNOW_TEXTURE "curlingball.bmp"
-#define CAMO_SNOW_OBJ "curlingmodel.obj"
 
 class Model{
 
@@ -42,7 +38,7 @@ class Model{
 
         ~Model(){}
 
-        void Init(const char* objFile, const char* textureFile){
+        void init(const char* objFile, const char* textureFile){
 
             f_size = 0;
             filename = objFile;
