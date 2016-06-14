@@ -53,6 +53,7 @@ GLfloat  raio   = 20;
 GLfloat  angulo = 0.35*PI;
 //GLfloat  obsP[] = {raio*cos(angulo), 5.5, raio*sin(angulo)};
 GLfloat  obsP[] = {0,5,0};
+GLfloat objP[] = {5,0,0};
 GLfloat  incy   = 0.5;
 GLfloat  inca   = 0.03;
 GLfloat  angBule = 0;
@@ -78,14 +79,49 @@ GLUquadric* qobj;
 // ----------------- Disk
 GLdouble heightDisk = 1.0;
 GLdouble radiusDisk = 1.0;
+GLfloat  diskP[] = {5,heightDisk,0};
+GLfloat speedDisk = 0.0;
+// ----------------- Speed of Disk
+GLfloat incInitialSpeed=1;
+GLfloat initialSpeed=0;
+GLfloat flagIncrement=1;
+GLfloat constantSpeed = 0.3;
+
+// ----------------- Stick
+GLfloat heightStick = 3;
+GLfloat lengthStick = 3;
+
+GLfloat  stickP[] = {0,heightStick,lengthStick};
+GLfloat  stickP2[] = {0,heightStick,0};
+GLfloat  positionStick[] = {diskP[0]+radiusDisk, 0,-lengthStick/2};
 //const float PI = 3.14159/180;
 
 // ----------------- Texto
 char texto[30];
 
+// ----------------- START
+int start=1;
+int moveBall=0;
+int moveStick=0;
+int leftStick=0;
+int rightStick=0;
 
 void drawStick() {
+	
+	glTranslatef(positionStick[0], positionStick[1], positionStick[2]); // para se manter sempre em frente do disco
+//glRotatef(180,0,1,0);
+	glTranslatef(0,0,0);
+	glBegin(GL_LINES);									// stick da esquerda
+		glColor3f(0,0,1);
+		glVertex3i( 0,0,0);
+		glVertex3i(0, stickP[1], stickP[2]);	
+	glEnd();
 
+	glBegin(GL_LINES);									// stick da direita
+		glColor3f(1,0,0);
+		glVertex3i( 0,0,lengthStick);
+		glVertex3i(0, stickP2[1], stickP2[2]);
+	glEnd();
 }
 
 
@@ -200,7 +236,7 @@ void drawScene(){
 
 	glColor4f(0,0,0,0);
 	glPushMatrix();
-		glTranslatef(5,heightDisk,0);
+		glTranslatef(diskP[0], diskP[1], diskP[2]);
 		glRotatef(90,1,0,0);
 		gluCylinder(qobj, radiusDisk, radiusDisk, heightDisk, 40, 20);
 		drawCircle(0,0, radiusDisk);
@@ -212,10 +248,18 @@ void drawScene(){
 	sprintf(texto, "Pos: (%.0f,%.0f,%.0f)", obsP[0], obsP[1], obsP[2]);
 	displayText(texto,0,3,0);
 
-		//~~~~~~~~~~~~~~~~~~~~~~~Display Coordinates of Observer
+	//~~~~~~~~~~~~~~~~~~~~~~~Display Coordinates of Observer
 	glColor3f(0,0,1);
-	sprintf(texto, "Pos: (%.0f,%.0f,%.0f)", obsP[0], obsP[1], obsP[2]);
+	sprintf(texto, "Disco: (%.0f,%.0f,%.0f)", diskP[0], diskP[1], diskP[2]);
 	displayText(texto,0,0,0);
+
+	//~~~~~~~~~~~~~~~~~~~~~~~Display Initial Speed
+	glColor3f(0,0,1);
+	sprintf(texto, "Current speed: %.0f)", initialSpeed);
+	displayText(texto,20,2,0);
+
+
+	drawStick();
 
 	glutPostRedisplay();
 }
@@ -242,7 +286,7 @@ void display(void){
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	//gluLookAt(obsP[0], obsP[1], obsP[2], 0,0,0, 0, 1, 0);
-	gluLookAt(obsP[0], obsP[1], obsP[2], 5,0,0, 0, 1, 0);
+	gluLookAt(obsP[0], obsP[1], obsP[2], objP[0], objP[1], objP[2], 0, 1, 0);
 	
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[ Objectos ]
 	drawScene();
@@ -252,12 +296,64 @@ void display(void){
 }
 
 
+// J: mexer para a esquerda. K: mexer como se fosse o da direita
+void moveStickAutomatically() {
+	/*if (leftStick) {
+		positionStick[2] += 0.1;
+		if(positionStick[2] == )
+	}*/
+}
+
+
+void moveBallAutomatically() {
+	diskP[0] += constantSpeed*initialSpeed;
+	obsP[0] += constantSpeed*initialSpeed;
+	objP[0] += constantSpeed*initialSpeed;
+	if (diskP[0] > 20)
+		moveBall=!moveBall;
+
+}
+
+void incrementInitialSpeed() {
+	initialSpeed += incInitialSpeed;
+}
+
+void decrementInitialSpeed() {
+	initialSpeed -= incInitialSpeed;
+}
+
+void defineInitialSpeed() {
+	if (flagIncrement==0) {
+		decrementInitialSpeed();
+	}
+	else if (flagIncrement==1) {
+		incrementInitialSpeed();
+	}
+
+	// se atingir os limites superior ou inferior, inverte o sentido
+	if (initialSpeed==0 || initialSpeed == 5)
+		flagIncrement=!flagIncrement;
+}
+
+/* função evocada de x em x segundos */
 void Timer(int value) 
 {
     //TODO: mudar imagem na tela
-	angBule=angBule+incBule;
+	if (start) {
+		defineInitialSpeed();
+	}
+
+	if (moveBall) {
+		moveBallAutomatically();
+	}
+
+	if (moveStick) {
+		moveStickAutomatically();
+	}
+
 	glutPostRedisplay();
 	glutTimerFunc(msec,Timer, 1);
+
 }
 
 //======================================================= EVENTOS
@@ -265,6 +361,22 @@ void keyboard(unsigned char key, int x, int y){
 	
 	switch (key) {
 
+	case 's':
+	case 'S':
+		start=0; // já não estamos em modo start
+		moveBall=1;
+		glutPostRedisplay();
+		break;
+
+	case 'j':
+	case 'J':
+		if (!moveStick) {
+			moveStick=1;
+			glutPostRedisplay();
+			break;
+		}
+		break;
+/*
 	//--------------------------- Textura no papel de parede
 	case 't':
 	case 'T':
@@ -275,7 +387,7 @@ void keyboard(unsigned char key, int x, int y){
 	case 'Q':
 		defineProj=(defineProj+1)%2;
 		glutPostRedisplay();
-		break;
+		break;*/
 	//--------------------------- Escape
 	case 27:
 		exit(0);
